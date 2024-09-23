@@ -1,6 +1,9 @@
 import functions
 import PySimpleGUI as sg      # simple GUI third-party module
+import time
 
+
+clock= sg.Text('', key="clock")
 label = sg.Text("Type in a to-do")   #
 input_box=sg.InputText(tooltip="Enter a Todo", key= "todo")   # creates an input box for typing with "enter a todoo" as prompt message at the input box
 add_button= sg.Button("ADD")                # creates a button ADD
@@ -15,14 +18,16 @@ the layout is used to place the GUI commands in the window
 placing the command in [" , "] separated by commas place the command in same line"""
 
 window=sg.Window('My To-Do App',
-                 layout=[[label],[input_box,add_button],
-                         [list_box,edit_button],[complete_button,exit_button]],
+                 layout=[[clock],
+                         [label],[input_box,add_button],
+                         [list_box,edit_button,complete_button],[exit_button]],
                  font=('Helvetica',20))
 
 """ Running the loop while true boolean and executing the command"""
 
 while True:
-    event, values= window.read()  #extracting event(ADD,EDIT,COMPLETE etc) and values from the window listbox as todos and inputbox as todo
+    event, values= window.read(timeout=100)  #extracting event(ADD,EDIT,COMPLETE etc) and values from the window listbox as todos and inputbox as todo
+    window['clock'].update(value=time.strftime("%b %d, %Y %H:%M:%S"))
     print(event)
     print(values)
     match event:
@@ -42,26 +47,32 @@ while True:
 
 
         case "EDIT":
-            todo_to_edit= values['todos'][0]   # extracting the dictionary associated to values[todos]- from the listbox
-            newtodo=values['todo']              # newtodo is extracted from the input box
-            todos=functions.get_todos()
-            index=todos.index(todo_to_edit)        # index is extracted
-            todos[index]= newtodo+'\n'              # data is override and written to file
-            functions.write_todos(todos)
-            list_box=window['todos'].update(values=todos)
+            try:
+                todo_to_edit= values['todos'][0]   # extracting the dictionary associated to values[todos]- from the listbox
+                newtodo=values['todo']              # newtodo is extracted from the input box
+                todos=functions.get_todos()
+                index=todos.index(todo_to_edit)        # index is extracted
+                todos[index]= newtodo+'\n'              # data is override and written to file
+                functions.write_todos(todos)
+                list_box=window['todos'].update(values=todos)
+            except IndexError:
+                sg.popup("First select an item to Edit first", font=("Helvetica",20))
 
-            """when we click todo from the listbox, its is extracted from the list and is placed in the Input box
+            """when we click tod   o from the listbox, its is extracted from the list and is placed in the Input box
             as assigning the dictionary value[todo]= values[todos][0]. updating in realtime. """
         case "todos":
             input_box=window['todo'].update(value=values['todos'][0])
 
         case "COMPLETE":
-            todo_complete= values['todos'][0]
-            todos=functions.get_todos()
-            todos.remove(todo_complete)
-            functions.write_todos(todos)
-            list_box=window['todos'].update(values=todos)
-            input_box=window['todo'].update(value="")
+            try:
+                todo_complete= values['todos'][0]
+                todos=functions.get_todos()
+                todos.remove(todo_complete)
+                functions.write_todos(todos)
+                list_box=window['todos'].update(values=todos)
+                input_box=window['todo'].update(value="")
+            except IndexError:
+                sg.popup("First Select a completed item", font=("Helvetica",20))
         case "EXIT":
             break
         case sg.WIN_CLOSED:
