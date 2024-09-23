@@ -13,7 +13,7 @@ while True:
         todos.append(todo)
         functions.write_todos(todos,"todos.txt")
     elif user_action.startswith("SHOW"):
-        functions.todos= get_todos("todos.txt")
+        todos=functions.get_todos("todos.txt")
         newtodos = []
         for items in todos:
             newitem = items.strip('\n')  # strip is used to remove the space at the begining of the sentence

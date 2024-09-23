@@ -1,6 +1,4 @@
-play
-sing
-wash clothes
-PLAY FOOTBALL
-Hello
-Hi
+Wash Utensils
+Go to play football
+Play basketball
+Read a Book
